@@ -8,6 +8,10 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "maintenance")
 @Getter
@@ -27,4 +31,9 @@ public class Maintenance {
 
     @Column(length = 255)
     private String description;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "vehicule_id")
+    private Vehicule vehicule;
+
 }

@@ -9,6 +9,10 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "paiement")
 @Getter
@@ -30,4 +34,9 @@ public class Paiement {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private ModePaiement modePaiement;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contrat_id")
+    private Contrat contrat;
+
 }

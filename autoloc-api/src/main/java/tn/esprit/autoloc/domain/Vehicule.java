@@ -8,6 +8,10 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "vehicule")
 @Getter
@@ -39,4 +43,24 @@ public class Vehicule {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StatutVehicule statut;
+
+    @ManyToOne
+    @JoinColumn(name = "agence_id")
+    private Agence agence;
+
+    @ManyToMany
+    @JoinTable(name = "vehicule_equipement",
+            joinColumns = @JoinColumn(name = "vehicule_id"),
+            inverseJoinColumns = @JoinColumn(name = "equipement_id"))
+    @JsonIgnore
+    private List<Equipement> equipements = new ArrayList<>();
+
+    @OneToMany(mappedBy = "vehicule")
+    @JsonIgnore
+    private List<Maintenance> maintenances = new ArrayList<>();
+
+    @OneToMany(mappedBy = "vehicule")
+    @JsonIgnore
+    private List<Reservation> reservations = new ArrayList<>();
+
 }

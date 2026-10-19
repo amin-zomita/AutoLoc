@@ -6,6 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "agence")
 @Getter
@@ -29,4 +33,12 @@ public class Agence {
 
     @Column(length = 20)
     private String telephone;
+
+    @OneToMany(mappedBy = "agence", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Vehicule> vehicules = new ArrayList<>();
+
+    @OneToMany(mappedBy = "agence", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Employe> employes = new ArrayList<>();
 }
