@@ -1,0 +1,44 @@
+package tn.esprit.autoloc.web.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import tn.esprit.autoloc.domain.Employe;
+import tn.esprit.autoloc.service.IEmployeService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/employes")
+@RequiredArgsConstructor
+public class EmployeController {
+
+    private final IEmployeService employeService;
+
+    @GetMapping
+    public List<Employe> getAll() {
+        return employeService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Employe getById(@PathVariable Long id) {
+        return employeService.findById(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Employe create(@RequestBody Employe employe) {
+        return employeService.create(employe);
+    }
+
+    @PutMapping("/{id}")
+    public Employe update(@PathVariable Long id, @RequestBody Employe employe) {
+        return employeService.update(id, employe);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        employeService.delete(id);
+    }
+}
