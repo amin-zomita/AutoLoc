@@ -1,9 +1,10 @@
 package tn.esprit.autoloc.web.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Agence;
-import tn.esprit.autoloc.repository.IAgenceRepository;
+import tn.esprit.autoloc.service.IAgenceService;
 
 import java.util.List;
 
@@ -12,15 +13,32 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AgenceController {
 
-    private final IAgenceRepository agenceRepository;
+    private final IAgenceService agenceService;
 
     @GetMapping
     public List<Agence> getAll() {
-        return agenceRepository.findAll();
+        return agenceService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Agence getById(@PathVariable Long id) {
+        return agenceService.findById(id);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Agence create(@RequestBody Agence agence) {
-        return agenceRepository.save(agence);
+        return agenceService.create(agence);
+    }
+
+    @PutMapping("/{id}")
+    public Agence update(@PathVariable Long id, @RequestBody Agence agence) {
+        return agenceService.update(id, agence);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        agenceService.delete(id);
     }
 }

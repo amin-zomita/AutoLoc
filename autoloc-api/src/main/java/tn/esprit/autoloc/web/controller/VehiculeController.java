@@ -1,9 +1,10 @@
 package tn.esprit.autoloc.web.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Vehicule;
-import tn.esprit.autoloc.repository.IVehiculeRepository;
+import tn.esprit.autoloc.service.IVehiculeService;
 
 import java.util.List;
 
@@ -12,15 +13,32 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VehiculeController {
 
-    private final IVehiculeRepository vehiculeRepository;
+    private final IVehiculeService vehiculeService;
 
     @GetMapping
     public List<Vehicule> getAll() {
-        return vehiculeRepository.findAll();
+        return vehiculeService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Vehicule getById(@PathVariable Long id) {
+        return vehiculeService.findById(id);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Vehicule create(@RequestBody Vehicule vehicule) {
-        return vehiculeRepository.save(vehicule);
+        return vehiculeService.create(vehicule);
+    }
+
+    @PutMapping("/{id}")
+    public Vehicule update(@PathVariable Long id, @RequestBody Vehicule vehicule) {
+        return vehiculeService.update(id, vehicule);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        vehiculeService.delete(id);
     }
 }
