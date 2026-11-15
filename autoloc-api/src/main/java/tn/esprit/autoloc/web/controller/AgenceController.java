@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Agence;
+import tn.esprit.autoloc.domain.Employe;
+import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.service.IAgenceService;
 
 import java.util.List;
@@ -40,5 +42,39 @@ public class AgenceController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         agenceService.delete(id);
+    }
+
+    @GetMapping("/{id}/vehicules")
+    public List<Vehicule> getVehicules(@PathVariable Long id) {
+        return agenceService.findVehicules(id);
+    }
+
+    @PutMapping("/{id}/vehicules/{idVehicule}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void affecterVehicule(@PathVariable Long id, @PathVariable Long idVehicule) {
+        agenceService.affecterVehicule(id, idVehicule);
+    }
+
+    @DeleteMapping("/{id}/vehicules/{idVehicule}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void desaffecterVehicule(@PathVariable Long id, @PathVariable Long idVehicule) {
+        agenceService.desaffecterVehicule(id, idVehicule);
+    }
+
+    @GetMapping("/{id}/employes")
+    public List<Employe> getEmployes(@PathVariable Long id) {
+        return agenceService.findEmployes(id);
+    }
+
+    @PutMapping("/{id}/employes/{idEmploye}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void affecterEmploye(@PathVariable Long id, @PathVariable Long idEmploye) {
+        agenceService.affecterEmploye(id, idEmploye);
+    }
+
+    @DeleteMapping("/{id}/employes/{idEmploye}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void desaffecterEmploye(@PathVariable Long id, @PathVariable Long idEmploye) {
+        agenceService.desaffecterEmploye(id, idEmploye);
     }
 }

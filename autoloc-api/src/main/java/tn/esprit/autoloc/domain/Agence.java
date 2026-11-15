@@ -41,4 +41,24 @@ public class Agence {
     @OneToMany(mappedBy = "agence", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Employe> employes = new ArrayList<>();
+
+    public void addVehicule(Vehicule vehicule) {
+        this.vehicules.add(vehicule);
+        vehicule.setAgence(this);
+    }
+
+    public void removeVehicule(Vehicule vehicule) {
+        this.vehicules.remove(vehicule);
+        vehicule.setAgence(null);
+    }
+
+    public void addEmploye(Employe employe) {
+        this.employes.add(employe);
+        employe.setAgence(this);
+    }
+
+    public void removeEmploye(Employe employe) {
+        this.employes.remove(employe);
+        employe.setAgence(null);
+    }
 }
