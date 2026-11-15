@@ -63,4 +63,14 @@ public class Vehicule {
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
+    public void addEquipement(Equipement equipement) {
+        this.equipements.add(equipement);
+        equipement.getVehicules().add(this);
+    }
+
+    public void removeEquipement(Equipement equipement) {
+        this.equipements.remove(equipement);
+        equipement.getVehicules().remove(this);
+    }
+
 }

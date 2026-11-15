@@ -3,6 +3,7 @@ package tn.esprit.autoloc.web.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.service.IVehiculeService;
 
@@ -40,5 +41,24 @@ public class VehiculeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         vehiculeService.delete(id);
+    }
+
+    @GetMapping("/{id}/equipements")
+    public List<Equipement> getEquipements(@PathVariable Long id) {
+        return vehiculeService.findEquipements(id);
+    }
+
+    @PutMapping("/{id}/equipements/{idEquipement}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void affecterEquipement(@PathVariable Long id,
+                                   @PathVariable Long idEquipement) {
+        vehiculeService.affecterEquipement(id, idEquipement);
+    }
+
+    @DeleteMapping("/{id}/equipements/{idEquipement}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void desaffecterEquipement(@PathVariable Long id,
+                                      @PathVariable Long idEquipement) {
+        vehiculeService.desaffecterEquipement(id, idEquipement);
     }
 }

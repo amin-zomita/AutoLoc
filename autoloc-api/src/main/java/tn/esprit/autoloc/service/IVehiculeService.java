@@ -1,5 +1,6 @@
 package tn.esprit.autoloc.service;
 
+import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.domain.Vehicule;
 
 import java.util.List;
@@ -15,4 +16,10 @@ public interface IVehiculeService {
     Vehicule update(Long id, Vehicule vehicule);
 
     void delete(Long id);
+
+    List<Equipement> findEquipements(Long idVehicule);
+
+    void affecterEquipement(Long idVehicule, Long idEquipement);
+
+    void desaffecterEquipement(Long idVehicule, Long idEquipement);
 }
