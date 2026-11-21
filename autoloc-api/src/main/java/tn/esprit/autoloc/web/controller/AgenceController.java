@@ -5,8 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Agence;
 import tn.esprit.autoloc.domain.Employe;
-import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.service.IAgenceService;
+import tn.esprit.autoloc.web.dto.VehiculeResponseDTO;
+import tn.esprit.autoloc.web.mapper.VehiculeMapper;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class AgenceController {
 
     private final IAgenceService agenceService;
+    private final VehiculeMapper vehiculeMapper;
 
     @GetMapping
     public List<Agence> getAll() {
@@ -45,8 +47,10 @@ public class AgenceController {
     }
 
     @GetMapping("/{id}/vehicules")
-    public List<Vehicule> getVehicules(@PathVariable Long id) {
-        return agenceService.findVehicules(id);
+    public List<VehiculeResponseDTO> getVehicules(@PathVariable Long id) {
+        return agenceService.findVehicules(id).stream()
+                .map(vehiculeMapper::toResponse)
+                .toList();
     }
 
     @PutMapping("/{id}/vehicules/{idVehicule}")

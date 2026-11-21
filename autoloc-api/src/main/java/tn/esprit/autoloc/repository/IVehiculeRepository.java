@@ -4,4 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import tn.esprit.autoloc.domain.Vehicule;
 
 public interface IVehiculeRepository extends JpaRepository<Vehicule, Long> {
+
+    boolean existsByImmatriculation(String immatriculation);
+
+    boolean existsByImmatriculationAndIdVehiculeNot(String immatriculation, Long idVehicule);
 }

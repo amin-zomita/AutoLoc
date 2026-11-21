@@ -1,11 +1,15 @@
 package tn.esprit.autoloc.web.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.service.IVehiculeService;
+import tn.esprit.autoloc.web.dto.VehiculeRequestDTO;
+import tn.esprit.autoloc.web.dto.VehiculeResponseDTO;
+import tn.esprit.autoloc.web.mapper.VehiculeMapper;
 
 import java.util.List;
 
@@ -15,26 +19,32 @@ import java.util.List;
 public class VehiculeController {
 
     private final IVehiculeService vehiculeService;
+    private final VehiculeMapper vehiculeMapper;
 
     @GetMapping
-    public List<Vehicule> getAll() {
-        return vehiculeService.findAll();
+    public List<VehiculeResponseDTO> getAll() {
+        return vehiculeService.findAll().stream()
+                .map(vehiculeMapper::toResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Vehicule getById(@PathVariable Long id) {
-        return vehiculeService.findById(id);
+    public VehiculeResponseDTO getById(@PathVariable Long id) {
+        return vehiculeMapper.toResponse(vehiculeService.findById(id));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Vehicule create(@RequestBody Vehicule vehicule) {
-        return vehiculeService.create(vehicule);
+    public VehiculeResponseDTO create(@Valid @RequestBody VehiculeRequestDTO dto) {
+        Vehicule cree = vehiculeService.create(vehiculeMapper.toEntity(dto));
+        return vehiculeMapper.toResponse(cree);
     }
 
     @PutMapping("/{id}")
-    public Vehicule update(@PathVariable Long id, @RequestBody Vehicule vehicule) {
-        return vehiculeService.update(id, vehicule);
+    public VehiculeResponseDTO update(@PathVariable Long id,
+                                      @Valid @RequestBody VehiculeRequestDTO dto) {
+        Vehicule modifie = vehiculeService.update(id, vehiculeMapper.toEntity(dto));
+        return vehiculeMapper.toResponse(modifie);
     }
 
     @DeleteMapping("/{id}")

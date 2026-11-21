@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import tn.esprit.autoloc.domain.Equipement;
+import tn.esprit.autoloc.domain.StatutVehicule;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.repository.IEquipementRepository;
 import tn.esprit.autoloc.repository.IVehiculeRepository;
@@ -36,7 +37,8 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
     @Override
     public Vehicule create(Vehicule vehicule) {
-        vehiculeValidator.valider(vehicule);
+        vehiculeValidator.validerCreation(vehicule);
+        vehicule.setStatut(StatutVehicule.DISPONIBLE);
         Vehicule cree = vehiculeRepository.save(vehicule);
         journalisationService.journaliserCreation("Vehicule", cree.getIdVehicule());
         return cree;
@@ -45,13 +47,12 @@ public class VehiculeServiceImpl implements IVehiculeService {
     @Override
     public Vehicule update(Long id, Vehicule vehicule) {
         Vehicule existant = findById(id);
-        vehiculeValidator.valider(vehicule);
+        vehiculeValidator.validerModification(id, vehicule);
         existant.setImmatriculation(vehicule.getImmatriculation());
         existant.setMarque(vehicule.getMarque());
         existant.setModele(vehicule.getModele());
         existant.setCategorie(vehicule.getCategorie());
         existant.setTarifJournalier(vehicule.getTarifJournalier());
-        existant.setStatut(vehicule.getStatut());
         Vehicule modifie = vehiculeRepository.save(existant);
         journalisationService.journaliserModification("Vehicule", modifie.getIdVehicule());
         return modifie;

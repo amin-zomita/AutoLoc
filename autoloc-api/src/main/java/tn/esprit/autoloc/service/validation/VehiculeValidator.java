@@ -1,25 +1,35 @@
 package tn.esprit.autoloc.service.validation;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import tn.esprit.autoloc.domain.Vehicule;
-
-import java.math.BigDecimal;
+import tn.esprit.autoloc.repository.IVehiculeRepository;
 
 @Component
+@RequiredArgsConstructor
 public class VehiculeValidator {
 
-    public void valider(Vehicule vehicule) {
-        BigDecimal tarif = vehicule.getTarifJournalier();
+    private final IVehiculeRepository vehiculeRepository;
 
-        if (tarif == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Le tarif journalier est obligatoire");
+    // Création : aucun véhicule ne doit déjà avoir cette immatriculation
+    public void validerCreation(Vehicule vehicule) {
+        if (vehiculeRepository.existsByImmatriculation(vehicule.getImmatriculation())) {
+            throw conflitImmatriculation(vehicule.getImmatriculation());
         }
-        if (tarif.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Le tarif journalier doit être strictement positif");
+    }
+
+    // Modification : même contrôle, en excluant le véhicule modifié lui-même
+    public void validerModification(Long idVehicule, Vehicule vehicule) {
+        if (vehiculeRepository.existsByImmatriculationAndIdVehiculeNot(
+                vehicule.getImmatriculation(), idVehicule)) {
+            throw conflitImmatriculation(vehicule.getImmatriculation());
         }
+    }
+
+    private ResponseStatusException conflitImmatriculation(String immatriculation) {
+        return new ResponseStatusException(HttpStatus.CONFLICT,
+                "Immatriculation déjà utilisée par un autre véhicule : " + immatriculation);
     }
 }
