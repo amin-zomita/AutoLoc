@@ -1,9 +1,9 @@
 package tn.esprit.autoloc.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.domain.Vehicule;
@@ -65,6 +65,7 @@ public class VehiculeServiceImpl implements IVehiculeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Equipement> findEquipements(Long idVehicule) {
         return findById(idVehicule).getEquipements();
     }
