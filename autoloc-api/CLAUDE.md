@@ -47,4 +47,4 @@ Fait :
 4. Séance 12 : AOP (remplacera `JournalisationService`).
 5. Séance 13 : tests, SonarQube.
 
-Branches : `corrections-coherence` part de `atelier-gof-solid`, qui part de `main` (à jour jusqu'à la Séance 8). Ni l'une ni l'autre n'est encore fusionnée dans `main`.
+Branches : `atelier-gof-solid` et `corrections-coherence` sont fusionnées dans `main`. Séance 9 en cours sur `seance-9-dto-validation`, partie de `main`.
