@@ -2,15 +2,18 @@ package tn.esprit.autoloc.web.advice;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
+import tn.esprit.autoloc.web.dto.ChampInvalide;
 import tn.esprit.autoloc.web.dto.ErreurDTO;
 
 import java.time.LocalDateTime;
@@ -45,6 +48,28 @@ public class GlobalExceptionHandler {
         return construire(HttpStatus.BAD_REQUEST, message, request);
     }
 
+    // Échec de @Valid sur un @RequestBody : un ChampInvalide par contrainte non respectée
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErreurDTO> gererValidation(MethodArgumentNotValidException ex,
+                                                     HttpServletRequest request) {
+        List<ChampInvalide> champs = ex.getBindingResult().getFieldErrors().stream()
+                .map(erreur -> new ChampInvalide(erreur.getField(), erreur.getDefaultMessage()))
+                .toList();
+        return construire(HttpStatus.BAD_REQUEST, "Données invalides", request, champs);
+    }
+
+    // Contrainte de la base violée : valeur unique en double, clé étrangère encore référencée...
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErreurDTO> gererIntegrite(DataIntegrityViolationException ex,
+                                                    HttpServletRequest request) {
+        log.warn("Violation d'intégrité sur {} {} : {}", request.getMethod(),
+                request.getRequestURI(), ex.getMostSpecificCause().getMessage());
+        return construire(HttpStatus.CONFLICT,
+                "Opération impossible : conflit avec des données existantes "
+                        + "(valeur déjà utilisée ou élément encore référencé)",
+                request);
+    }
+
     // Dernier recours
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErreurDTO> gererAutres(Exception ex, HttpServletRequest request) {
@@ -59,6 +84,12 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ErreurDTO> construire(HttpStatusCode status, String message,
                                                  HttpServletRequest request) {
+        return construire(status, message, request, List.of());
+    }
+
+    private ResponseEntity<ErreurDTO> construire(HttpStatusCode status, String message,
+                                                 HttpServletRequest request,
+                                                 List<ChampInvalide> champs) {
         HttpStatus httpStatus = HttpStatus.resolve(status.value());
         String erreur = httpStatus != null ? httpStatus.getReasonPhrase() : "Erreur";
         ErreurDTO corps = new ErreurDTO(
@@ -67,7 +98,7 @@ public class GlobalExceptionHandler {
                 message != null ? message : erreur,
                 LocalDateTime.now(),
                 request.getRequestURI(),
-                List.of());
+                champs);
         return ResponseEntity.status(status).body(corps);
     }
 }
