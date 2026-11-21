@@ -74,6 +74,10 @@ public class AgenceServiceImpl implements IAgenceService {
         Vehicule vehicule = vehiculeRepository.findById(idVehicule)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Véhicule introuvable : " + idVehicule));
+        if (vehicule.getAgence() != null && vehicule.getAgence().getIdAgence().equals(idAgence)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Ce véhicule appartient déjà à cette agence");
+        }
         if (vehicule.getAgence() != null) {
             vehicule.getAgence().removeVehicule(vehicule);
         }
@@ -101,6 +105,10 @@ public class AgenceServiceImpl implements IAgenceService {
         Employe employe = employeRepository.findById(idEmploye)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Employé introuvable : " + idEmploye));
+        if (employe.getAgence() != null && employe.getAgence().getIdAgence().equals(idAgence)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cet employé appartient déjà à cette agence");
+        }
         if (employe.getAgence() != null) {
             employe.getAgence().removeEmploye(employe);
         }
