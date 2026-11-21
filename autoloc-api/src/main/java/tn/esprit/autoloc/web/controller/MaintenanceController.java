@@ -31,6 +31,11 @@ public class MaintenanceController {
         return maintenanceService.create(maintenance);
     }
 
+    @PutMapping("/{id}/terminer")
+    public Maintenance terminer(@PathVariable Long id) {
+        return maintenanceService.terminer(id);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {

@@ -8,5 +8,6 @@ public interface IMaintenanceService {
     List<Maintenance> findAll();
     Maintenance findById(Long id);
     Maintenance create(Maintenance maintenance);
+    Maintenance terminer(Long id);
     void delete(Long id);
 }

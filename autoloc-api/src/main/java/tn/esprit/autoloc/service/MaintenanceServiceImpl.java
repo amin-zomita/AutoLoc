@@ -11,6 +11,7 @@ import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.repository.IMaintenanceRepository;
 import tn.esprit.autoloc.repository.IVehiculeRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -39,6 +40,10 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Le véhicule est obligatoire");
         }
+        if (maintenance.getDateFin() != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "La date de fin ne doit pas être fournie : elle est renseignée en terminant la maintenance");
+        }
         Vehicule vehicule = vehiculeRepository.findById(maintenance.getVehicule().getIdVehicule())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Véhicule introuvable"));
@@ -51,8 +56,43 @@ public class MaintenanceServiceImpl implements IMaintenanceService {
     }
 
     @Override
+    @Transactional
+    public Maintenance terminer(Long id) {
+        Maintenance maintenance = findById(id);
+        if (maintenance.getDateFin() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cette maintenance est déjà terminée");
+        }
+        LocalDate aujourdhui = LocalDate.now();
+        if (maintenance.getDateDebut().isAfter(aujourdhui)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "La maintenance n'a pas encore commencé");
+        }
+        maintenance.setDateFin(aujourdhui);
+        mettreAJourStatutVehicule(maintenance);
+        return maintenance;
+    }
+
+    @Override
+    @Transactional
     public void delete(Long id) {
-        findById(id);
+        Maintenance maintenance = findById(id);
+        if (maintenance.getDateFin() == null) {
+            mettreAJourStatutVehicule(maintenance);
+        }
         maintenanceRepository.deleteById(id);
+    }
+
+    private void mettreAJourStatutVehicule(Maintenance maintenance) {
+        Vehicule vehicule = maintenance.getVehicule();
+        if (vehicule == null || vehicule.getStatut() != StatutVehicule.MAINTENANCE) {
+            return;
+        }
+        boolean autreMaintenanceEnCours = maintenanceRepository
+                .existsByVehiculeIdVehiculeAndDateFinIsNullAndIdMaintenanceNot(
+                        vehicule.getIdVehicule(), maintenance.getIdMaintenance());
+        if (!autreMaintenanceEnCours) {
+            vehicule.setStatut(StatutVehicule.DISPONIBLE);
+        }
     }
 }
