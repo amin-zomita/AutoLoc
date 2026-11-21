@@ -9,6 +9,7 @@ import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.repository.IEquipementRepository;
 import tn.esprit.autoloc.repository.IVehiculeRepository;
+import tn.esprit.autoloc.service.validation.VehiculeValidator;
 
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
     private final IVehiculeRepository vehiculeRepository;
     private final IEquipementRepository equipementRepository;
+    private final VehiculeValidator vehiculeValidator;
+    private final JournalisationService journalisationService;
 
     @Override
     public List<Vehicule> findAll() {
@@ -33,12 +36,16 @@ public class VehiculeServiceImpl implements IVehiculeService {
 
     @Override
     public Vehicule create(Vehicule vehicule) {
-        return vehiculeRepository.save(vehicule);
+        vehiculeValidator.valider(vehicule);
+        Vehicule cree = vehiculeRepository.save(vehicule);
+        journalisationService.journaliserCreation("Vehicule", cree.getIdVehicule());
+        return cree;
     }
 
     @Override
     public Vehicule update(Long id, Vehicule vehicule) {
         Vehicule existant = findById(id);
+        vehiculeValidator.valider(vehicule);
         existant.setImmatriculation(vehicule.getImmatriculation());
         existant.setMarque(vehicule.getMarque());
         existant.setModele(vehicule.getModele());
@@ -46,7 +53,9 @@ public class VehiculeServiceImpl implements IVehiculeService {
         existant.setTarifJournalier(vehicule.getTarifJournalier());
         existant.setStatut(vehicule.getStatut());
         existant.setAgence(vehicule.getAgence());
-        return vehiculeRepository.save(existant);
+        Vehicule modifie = vehiculeRepository.save(existant);
+        journalisationService.journaliserModification("Vehicule", modifie.getIdVehicule());
+        return modifie;
     }
 
     @Override
